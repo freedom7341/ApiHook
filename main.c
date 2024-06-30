@@ -13,6 +13,10 @@
 #include <windows.h>
 #include "usrapihk.h"
 #include "main.h"
+#include "thmfunc.h"
+
+/* Defines */
+#define WM_THEMECHANGED 0x031A
 
 /* Global Variables */
 USERAPIHOOK g_user32ApiHook;
@@ -90,17 +94,17 @@ __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah
 		return TRUE;
 	}
 
-	MessageBox(NULL, L"InitUserHook initializing", L"Cascades", MB_OK);
+	MessageBox(NULL, L"InitUserHook initializing", L"ApiHookTest", MB_OK);
 
 	/* Store the original functions from user32 */
 	g_user32ApiHook = *puah;
 
-	puah->DefWindowProcA = NtStyleDefWindowProcA;
-	puah->DefWindowProcW = NtStyleDefWindowProcW;
-	puah->PreWndProc = NtStylePreWindowProc;
-	puah->PostWndProc = NtStylePostWindowProc;
-	puah->PreDefDlgProc = NtStyleDlgPreWindowProc;
-	puah->PostDefDlgProc = NtStyleDlgPostWindowProc;
+	puah->DefWindowProcA = ThemeDefWindowProcA;
+	puah->DefWindowProcW = ThemeDefWindowProcW;
+	puah->PreWndProc = ThemePreWindowProc;
+	puah->PostWndProc = ThemePostWindowProc;
+	puah->PreDefDlgProc = ThemePreDefDlgProc;
+	puah->PostDefDlgProc = ThemePostDefDlgProc;
 	puah->DefWndProcArray.MsgBitArray = gabDWPmessages;
 	puah->DefWndProcArray.Size = UAHOWP_MAX_SIZE;
 	puah->WndProcArray.MsgBitArray = gabMSGPmessages;
@@ -108,9 +112,9 @@ __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah
 	puah->DlgProcArray.MsgBitArray = gabDLGPmessages;
 	puah->DlgProcArray.Size = UAHOWP_MAX_SIZE;
 
-	puah->SetWindowRgn = NtStyleSetWindowRgn;
-	puah->GetScrollInfo = NtStyleGetScrollInfo;
-	puah->SetScrollInfo = NtStyleSetScrollInfo;
+	puah->SetWindowRgn = (FARPROC)ThemeSetWindowRgn;
+	puah->GetScrollInfo = (FARPROC)ThemeGetScrollInfo;
+	puah->SetScrollInfo = (FARPROC)ThemeSetScrollInfo;
 
 	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCPAINT);
 	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCACTIVATE);

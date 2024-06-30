@@ -308,6 +308,10 @@
 				RelativePath=".\main.c"
 				>
 			</File>
+			<File
+				RelativePath=".\thmfunc.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -316,6 +320,10 @@
 			>
 			<File
 				RelativePath=".\main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\thmfunc.h"
 				>
 			</File>
 			<File

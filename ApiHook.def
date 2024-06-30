@@ -1,4 +1,4 @@
-LIBRARY   APIHOOK
+LIBRARY APIHOOK
 EXPORTS
    InstallUserHook   @1
    InitUserHook      @2

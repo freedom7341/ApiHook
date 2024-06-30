@@ -76,7 +76,7 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 	uah.m_funname2 = L"InitUserHook";
 	uah.m_dllname2 = L"ApiHook.dll";
 
-	return RegisterUserApiHookDelay(&uah);
+	return RegisterUserApiHook(&uah);
 }
 
 /* * * *\
@@ -175,7 +175,7 @@ BOOL WINAPI RegisterUserApiHookDelay(PUSERAPIHOOKINFO ApiHookInfo)
 
 	if (hLib)
 	{
-		FARPROC fLib = GetProcAddress(hLib, "RegisterUserApiHookDelay");
+		FARPROC fLib = GetProcAddress(hLib, "RegisterUserApiHook");
 
 		bRet = (BOOL)fLib(ApiHookInfo);
 

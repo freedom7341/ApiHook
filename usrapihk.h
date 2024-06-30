@@ -75,3 +75,7 @@ typedef enum _UAPIHK
 	uahStop,
 	uahShutdown
 } UAPIHK, * PUAPIHK;
+
+/* Function Prototypes */
+BOOL WINAPI RegisterUserApiHook(PUSERAPIHOOKINFO ApiHookInfo);
+BOOL WINAPI UnregisterUserApiHook(VOID);

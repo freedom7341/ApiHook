@@ -29,7 +29,7 @@ BOOL g_bThemeHooksActive = FALSE;
 
 /* * * *\
 	DllMain -
-		NT Style Hook's entry point
+		ApiHook's entry point
 \* * * */
 BOOL APIENTRY DllMain(
 	HMODULE hModule,
@@ -69,14 +69,14 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 {
 	USERAPIHOOKINFO uah;
 
-	OutputDebugString(L"InstallUserHook called");
+	OutputDebugString(L"InstallUserHook called\n");
 
 	uah.m_funname1 = L"InitUserHook";
 	uah.m_dllname1 = L"ApiHook.dll";
 	uah.m_funname2 = L"InitUserHook";
 	uah.m_dllname2 = L"ApiHook.dll";
 
-	return RegisterUserApiHookDelay(&uah);
+	return RegisterUserApiHook(&uah);
 }
 
 /* * * *\
@@ -85,7 +85,7 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 \* * * */
 __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah)
 {
-	OutputDebugString(L"InitUserHook called");
+	OutputDebugString(L"InitUserHook called\n");
 
 	// Don't initialize if the state isn't appropriate.
 	if (!puah || State != uahLoadInit)
@@ -94,7 +94,7 @@ __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah
 		return TRUE;
 	}
 
-	OutputDebugString(L"InitUserHook initializing");
+	OutputDebugString(L"InitUserHook initializing\n");
 
 	/* Store the original functions from user32 */
 	g_user32ApiHook = *puah;

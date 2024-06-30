@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApiHook", "ApiHook.vcproj", "{30324F1B-75CB-4CA1-B232-BC0B841640DE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApiHookLauncher", "ApiHookLauncher.vcproj", "{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,14 @@ Global
 		{30324F1B-75CB-4CA1-B232-BC0B841640DE}.Release|Win32.Build.0 = Release|Win32
 		{30324F1B-75CB-4CA1-B232-BC0B841640DE}.Release|x64.ActiveCfg = Release|x64
 		{30324F1B-75CB-4CA1-B232-BC0B841640DE}.Release|x64.Build.0 = Release|x64
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Debug|Win32.Build.0 = Debug|Win32
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Debug|x64.ActiveCfg = Debug|x64
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Debug|x64.Build.0 = Debug|x64
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Release|Win32.ActiveCfg = Release|Win32
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Release|Win32.Build.0 = Release|Win32
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Release|x64.ActiveCfg = Release|x64
+		{250FA9C8-7E69-48E4-BDED-CDD77E92CEC3}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

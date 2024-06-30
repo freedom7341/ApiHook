@@ -1,0 +1,17 @@
+/* * * * * * * *\
+	LAUNCH.RC -
+		Copyright © 2024 Brady McDermott
+	DESCRIPTION -
+		This file contains resource definitions.
+	LICENSE INFORMATION -
+		MIT License, see LICENSE.txt in the root folder
+\* * * * * * * */
+
+/* Necessary Evil */
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include <windows.h>
+#include "launch.h"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+/* Icon Library */
+IDI_MAIN	ICON	icons\apihook.ico

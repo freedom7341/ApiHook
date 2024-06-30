@@ -1,0 +1,2 @@
+## ApiHookTest
+Small program to test the behavior of the RegisterUserApiHook function on Windows. Solution is for Visual Studio 2005 but the program should be easy to port to newer versions if necessary.

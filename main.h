@@ -12,5 +12,6 @@
 
 /* Function Prototypes */
 __declspec(dllexport) BOOL CALLBACK InstallUserHook();
+__declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah);
 BOOL WINAPI RegisterUserApiHookDelay(PUSERAPIHOOKINFO ApiHookInfo);
 BOOL WINAPI UnregisterUserApiHookDelay(VOID);

@@ -14,6 +14,15 @@
 #include "usrapihk.h"
 #include "main.h"
 
+/* Global Variables */
+USERAPIHOOK g_user32ApiHook;
+BYTE gabDWPmessages[UAHOWP_MAX_SIZE];
+BYTE gabMSGPmessages[UAHOWP_MAX_SIZE];
+BYTE gabDLGPmessages[UAHOWP_MAX_SIZE];
+BOOL g_bThemeHooksActive = FALSE;
+
+/* Functions */
+
 /* * * *\
 	DllMain -
 		NT Style Hook's entry point
@@ -29,9 +38,20 @@ BOOL APIENTRY DllMain(
 	case DLL_PROCESS_ATTACH:
 		// Call InstallUserHook
 		InstallUserHook();
+		// Initialize once for each new process.
+		// Return FALSE to fail DLL load.
+		break;
+
 	case DLL_THREAD_ATTACH:
+		// Do thread-specific initialization.
+		break;
+
 	case DLL_THREAD_DETACH:
+		// Do thread-specific cleanup.
+		break;
+
 	case DLL_PROCESS_DETACH:
+		// Perform any necessary cleanup.
 		break;
 	}
 	return TRUE;
@@ -45,7 +65,7 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 {
 	USERAPIHOOKINFO uah;
 
-	MessageBox(NULL, L"InstallUserHook called", L"Cascades", MB_OK);
+	MessageBox(NULL, L"InstallUserHook called", L"ApiHookTest", MB_OK);
 
 	uah.m_funname1 = L"InitUserHook";
 	uah.m_dllname1 = L"ApiHook.dll";
@@ -53,6 +73,91 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 	uah.m_dllname2 = L"ApiHook.dll";
 
 	return RegisterUserApiHookDelay(&uah);
+}
+
+/* * * *\
+	InitUserHook -
+		Initialize the User32 API hook.
+\* * * */
+__declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah)
+{
+	MessageBox(NULL, L"InitUserHook called", L"ApiHookTest", MB_OK);
+
+	// Don't initialize if the state isn't appropriate.
+	if (!puah || State != uahLoadInit)
+	{
+		g_bThemeHooksActive = FALSE;
+		return TRUE;
+	}
+
+	MessageBox(NULL, L"InitUserHook initializing", L"Cascades", MB_OK);
+
+	/* Store the original functions from user32 */
+	g_user32ApiHook = *puah;
+
+	puah->DefWindowProcA = NtStyleDefWindowProcA;
+	puah->DefWindowProcW = NtStyleDefWindowProcW;
+	puah->PreWndProc = NtStylePreWindowProc;
+	puah->PostWndProc = NtStylePostWindowProc;
+	puah->PreDefDlgProc = NtStyleDlgPreWindowProc;
+	puah->PostDefDlgProc = NtStyleDlgPostWindowProc;
+	puah->DefWndProcArray.MsgBitArray = gabDWPmessages;
+	puah->DefWndProcArray.Size = UAHOWP_MAX_SIZE;
+	puah->WndProcArray.MsgBitArray = gabMSGPmessages;
+	puah->WndProcArray.Size = UAHOWP_MAX_SIZE;
+	puah->DlgProcArray.MsgBitArray = gabDLGPmessages;
+	puah->DlgProcArray.Size = UAHOWP_MAX_SIZE;
+
+	puah->SetWindowRgn = NtStyleSetWindowRgn;
+	puah->GetScrollInfo = NtStyleGetScrollInfo;
+	puah->SetScrollInfo = NtStyleSetScrollInfo;
+
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCPAINT);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCACTIVATE);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCMOUSEMOVE);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCMOUSELEAVE);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCHITTEST);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCLBUTTONDOWN);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCUAHDRAWCAPTION);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCUAHDRAWFRAME);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_SETTEXT);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_WINDOWPOSCHANGED);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_CONTEXTMENU);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_STYLECHANGED);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_SETICON);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_NCDESTROY);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_SYSCOMMAND);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_CTLCOLORMSGBOX);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_CTLCOLORBTN);
+	UAH_HOOK_MESSAGE(puah->DefWndProcArray, WM_CTLCOLORSTATIC);
+
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_CREATE);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_SETTINGCHANGE);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_DRAWITEM);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_MEASUREITEM);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_WINDOWPOSCHANGING);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_WINDOWPOSCHANGED);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_STYLECHANGING);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_STYLECHANGED);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_NCCREATE);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_NCDESTROY);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_NCPAINT);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_MENUCHAR);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_MDISETMENU);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_THEMECHANGED);
+	UAH_HOOK_MESSAGE(puah->WndProcArray, WM_UAHINIT);
+
+	puah->DlgProcArray.MsgBitArray = gabDLGPmessages;
+	puah->DlgProcArray.Size = UAHOWP_MAX_SIZE;
+
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_INITDIALOG);
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_CTLCOLORMSGBOX);
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_CTLCOLORBTN);
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_CTLCOLORDLG);
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_CTLCOLORSTATIC);
+	UAH_HOOK_MESSAGE(puah->DlgProcArray, WM_PRINTCLIENT);
+
+	return TRUE;
 }
 
 /* * * *\

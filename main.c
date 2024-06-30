@@ -69,14 +69,14 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 {
 	USERAPIHOOKINFO uah;
 
-	MessageBox(NULL, L"InstallUserHook called", L"ApiHookTest", MB_OK);
+	OutputDebugString(L"InstallUserHook called");
 
 	uah.m_funname1 = L"InitUserHook";
 	uah.m_dllname1 = L"ApiHook.dll";
 	uah.m_funname2 = L"InitUserHook";
 	uah.m_dllname2 = L"ApiHook.dll";
 
-	return RegisterUserApiHook(&uah);
+	return RegisterUserApiHookDelay(&uah);
 }
 
 /* * * *\
@@ -85,7 +85,7 @@ __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 \* * * */
 __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah)
 {
-	MessageBox(NULL, L"InitUserHook called", L"ApiHookTest", MB_OK);
+	OutputDebugString(L"InitUserHook called");
 
 	// Don't initialize if the state isn't appropriate.
 	if (!puah || State != uahLoadInit)
@@ -94,7 +94,7 @@ __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah
 		return TRUE;
 	}
 
-	MessageBox(NULL, L"InitUserHook initializing", L"ApiHookTest", MB_OK);
+	OutputDebugString(L"InitUserHook initializing");
 
 	/* Store the original functions from user32 */
 	g_user32ApiHook = *puah;

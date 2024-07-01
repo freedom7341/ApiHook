@@ -67,6 +67,8 @@ BOOL APIENTRY DllMain(
 \* * * */
 __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 {
+	USERAPIHOOKINFO_XP uahx;
+	USERAPIHOOKINFO_VISTA uahv;
 	USERAPIHOOKINFO uah;
 
 	OutputDebugString(L"InstallUserHook called\n");

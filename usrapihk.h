@@ -26,6 +26,21 @@
 #define UAHOWP_MAX_SIZE WM_USER/8
 
 /* Structures */
+typedef struct _USERAPIHOOKINFO_XP
+{
+	HINSTANCE hInstance; // Callback function
+	FARPROC CallbackFunc; // DLL 1
+} USERAPIHOOKINFO_XP, * PUSERAPIHOOKINFO_XP;
+
+typedef struct _USERAPIHOOKINFO_VISTA
+{
+	DWORD m_size;
+	LPCWSTR m_dllname1;
+	LPCWSTR m_funname1;
+	LPCWSTR m_dllname2;
+	LPCWSTR m_funname2;
+} USERAPIHOOKINFO_VISTA, * PUSERAPIHOOKINFO_VISTA;
+
 typedef struct _USERAPIHOOKINFO
 {
 	LPCWSTR	m_funname1; // Callback function

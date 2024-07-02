@@ -20,5 +20,5 @@ extern BOOL g_bThemeHooksActive;
 /* Function Prototypes */
 __declspec(dllexport) BOOL CALLBACK InstallUserHook();
 __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah);
-BOOL WINAPI RegisterUserApiHookDelay(PUSERAPIHOOKINFO ApiHookInfo);
+BOOL WINAPI RegisterUserApiHookDelay(HINSTANCE hInstance, PUSERAPIHOOKINFO ApiHookInfo);
 BOOL WINAPI UnregisterUserApiHookDelay(VOID);

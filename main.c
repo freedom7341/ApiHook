@@ -11,6 +11,7 @@
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <strsafe.h>
 #include "usrapihk.h"
 #include "main.h"
 #include "thmfunc.h"
@@ -19,6 +20,7 @@
 #define WM_THEMECHANGED 0x031A
 
 /* Global Variables */
+HMODULE g_hModule = NULL;
 USERAPIHOOK g_user32ApiHook;
 BYTE gabDWPmessages[UAHOWP_MAX_SIZE];
 BYTE gabMSGPmessages[UAHOWP_MAX_SIZE];
@@ -40,8 +42,12 @@ BOOL APIENTRY DllMain(
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
+		// Store our HMODULE as a global var
+		g_hModule = hModule;
+
 		// Call InstallUserHook
 		InstallUserHook();
+
 		// Initialize once for each new process.
 		// Return FALSE to fail DLL load.
 		break;
@@ -67,18 +73,24 @@ BOOL APIENTRY DllMain(
 \* * * */
 __declspec(dllexport) BOOL CALLBACK InstallUserHook()
 {
-	USERAPIHOOKINFO_XP uahx;
-	USERAPIHOOKINFO_VISTA uahv;
+	WCHAR szFullPath[MAX_PATH];
 	USERAPIHOOKINFO uah;
 
 	OutputDebugString(L"InstallUserHook called\n");
 
-	uah.m_funname1 = L"InitUserHook";
-	uah.m_dllname1 = L"ApiHook.dll";
-	uah.m_funname2 = L"InitUserHook";
-	uah.m_dllname2 = L"ApiHook.dll";
+	// Get our current directory and filename
+	GetModuleFileName(g_hModule, szFullPath, ARRAYSIZE(szFullPath));
 
-	return RegisterUserApiHook(&uah);
+	// Fill out the ApiHookInfo structure
+	uah.m_size = sizeof(uah);
+	uah.m_funname1 = L"InitUserHook";
+	uah.m_dllname1 = szFullPath;
+	uah.m_funname2 = L"InitUserHook";
+	uah.m_dllname2 = szFullPath;
+	
+	// ApiHook is not support on Windows
+	// 2000 or below!
+	return RegisterUserApiHookDelay(g_hModule, &uah);
 }
 
 /* * * *\
@@ -168,26 +180,54 @@ __declspec(dllexport) BOOL CALLBACK InitUserHook(UAPIHK State, PUSERAPIHOOK puah
 
 /* * * *\
 	RegisterUserApiHookDelay -
-		Run the User32 API hook.
+		Run the User32 API hook. Pick the
+		correct version and then hook!
 \* * * */
-BOOL WINAPI RegisterUserApiHookDelay(PUSERAPIHOOKINFO ApiHookInfo)
+BOOL WINAPI RegisterUserApiHookDelay(HINSTANCE hInstance, PUSERAPIHOOKINFO ApiHookInfo)
 {
 	HMODULE hLib = LoadLibrary(L"user32.dll");
 	BOOL bRet = 0;
+	DWORD dwMajorVersion = 0;
+	DWORD dwMinorVersion = 0;
+	DWORD dwVersion = 0;
+	
+	// Get the Windows version so that
+	// we can use the appropriate structures.
+	dwVersion = GetVersion();
+
+	dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+	dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
 
 	if (hLib)
 	{
-		FARPROC fLib = GetProcAddress(hLib, "RegisterUserApiHook");
+		if ((dwMajorVersion == 5) && (dwMinorVersion == 1))
+		{
+			USERAPIHOOKINFO_XP uah;
+			RUAH_XP fLib = (RUAH_XP)GetProcAddress(hLib, "RegisterUserApiHook");
 
-		bRet = (BOOL)fLib(ApiHookInfo);
+			uah.hInstance = hInstance;
+			uah.CallbackFunc = (FARPROC)InitUserHook;
+
+			bRet = fLib(&uah);
+		}
+		else if (((dwMajorVersion == 5) && (dwMinorVersion == 2))
+			|| (dwMajorVersion >= 6))
+		{
+			RUAH fLib = (RUAH)GetProcAddress(hLib, "RegisterUserApiHook");
+
+			bRet = fLib(ApiHookInfo);
+		}
 
 		FreeLibrary(hLib);
-
+		
 		return bRet;
 	}
 
+	// ApiHook is not support on Windows
+	// 2000 or below!
 	return FALSE;
 }
+
 
 /* * * *\
 	UnregisterUserApiHookDelay -

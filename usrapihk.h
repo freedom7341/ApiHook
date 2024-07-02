@@ -26,28 +26,27 @@
 #define UAHOWP_MAX_SIZE WM_USER/8
 
 /* Structures */
+
+// RegisterUserApiHook signature
+
+// NT 5.1
 typedef struct _USERAPIHOOKINFO_XP
 {
-	HINSTANCE hInstance; // Callback function
-	FARPROC CallbackFunc; // DLL 1
+	HINSTANCE hInstance; // hInstance
+	FARPROC CallbackFunc; // Callback function
 } USERAPIHOOKINFO_XP, * PUSERAPIHOOKINFO_XP;
+typedef BOOL(WINAPI* RUAH_XP)(PUSERAPIHOOKINFO_XP);
 
-typedef struct _USERAPIHOOKINFO_VISTA
-{
-	DWORD m_size;
-	LPCWSTR m_dllname1;
-	LPCWSTR m_funname1;
-	LPCWSTR m_dllname2;
-	LPCWSTR m_funname2;
-} USERAPIHOOKINFO_VISTA, * PUSERAPIHOOKINFO_VISTA;
-
+// NT 5.2 and newer
 typedef struct _USERAPIHOOKINFO
 {
-	LPCWSTR	m_funname1; // Callback function
-	LPCWSTR	m_dllname1; // DLL 1
-	LPCWSTR	m_funname2; // Callback function
-	LPCWSTR	m_dllname2; // DLL 2
+	DWORD m_size; // Size of the structure
+	LPCWSTR m_dllname1; // DLL 1
+	LPCWSTR m_funname1; // Callback function
+	LPCWSTR m_dllname2; // DLL 2
+	LPCWSTR m_funname2; // Callback function
 } USERAPIHOOKINFO, * PUSERAPIHOOKINFO;
+typedef BOOL(WINAPI* RUAH)(PUSERAPIHOOKINFO);
 
 typedef LRESULT(CALLBACK* WNDPROC_OWP)(HWND, UINT, WPARAM, LPARAM, ULONG_PTR, PDWORD);
 
